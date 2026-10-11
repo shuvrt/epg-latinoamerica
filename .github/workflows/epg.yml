@@ -17,6 +17,9 @@ concurrency:
 jobs:
   generar:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,6 +27,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      - name: Versiones
+        run: node -v && npm -v
 
       - name: Instalar dependencias
         run: npm ci
@@ -42,5 +48,9 @@ jobs:
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+          name: github-pages-${{ github.run_attempt }}
 
-      - uses: actions/deploy-pages@v4
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
