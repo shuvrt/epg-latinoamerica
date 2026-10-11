@@ -93,13 +93,13 @@ function parseImage($item) {
 function parseStart($item, date) {
   const time = $item('td:nth-child(1) > div > time').attr('datetime')
 
-  return dayjs.tz(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm', 'EST').utc()
+  return dayjs.tz(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm', 'America/New_York').utc()
 }
 
 function parseStop($item, date) {
   const time = $item('td:nth-child(2) > div > time').attr('datetime')
 
-  return dayjs.tz(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm', 'EST').utc()
+  return dayjs.tz(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm', 'America/New_York').utc()
 }
 
 function parseItems(content) {
