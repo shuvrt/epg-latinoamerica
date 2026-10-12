@@ -32,7 +32,6 @@ module.exports = {
 
       programs.push({
         title: parseTitle($item),
-        sub_title: parseSubTitle($item),
         description: parseDescription($item),
         image: parseImage($item),
         start,
@@ -81,10 +80,6 @@ function parseTitle($item) {
   return $item(
     'td:nth-child(4) > div > div > a > span,td:nth-child(3) > div > div > span,td:nth-child(3) > div > div > a > span'
   ).text()
-}
-
-function parseSubTitle($item) {
-  return $item('[class^="div_episode_"]').first().text().replace(/\s+/g, ' ').trim()
 }
 
 function parseDescription($item) {
