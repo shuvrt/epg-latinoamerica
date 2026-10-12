@@ -20,7 +20,7 @@ module.exports = {
     items.forEach((item, i) => {
       const $item = cheerio.load(item)
       let start = parseStart($item, date)
-      if (i === 0 && start.hour() >= 5) {
+      if (i === 0 && start.tz('America/New_York').hour() < 19) {
         start = start.add(1, 'day')
         date = date.add(1, 'day')
       }
