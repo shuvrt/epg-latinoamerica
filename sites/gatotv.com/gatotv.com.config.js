@@ -16,15 +16,16 @@ module.exports = {
   parser({ content, date }) {
     let programs = []
     const items = parseItems(content)
+    const offset = parseOffset(content)
     date = date.subtract(1, 'day')
     items.forEach((item, i) => {
       const $item = cheerio.load(item)
-      let start = parseStart($item, date)
-      if (i === 0 && start.tz('America/New_York').hour() < 19) {
+      let start = parseStart($item, date, offset)
+      if (i === 0 && start.add(offset * 60, 'minute').hour() < 19) {
         start = start.add(1, 'day')
         date = date.add(1, 'day')
       }
-      let stop = parseStop($item, date)
+      let stop = parseStop($item, date, offset)
       if (stop < start) {
         stop = stop.add(1, 'day')
         date = date.add(1, 'day')
@@ -95,16 +96,24 @@ function parseImage($item) {
   return $item('td:nth-child(3) > a > img').attr('src')
 }
 
-function parseStart($item, date) {
-  const time = $item('td:nth-child(1) > div > time').attr('datetime')
+// GatoTV muestra las horas en la zona del visitante y la declara en la pagina
+// (utcOffset del reloj). Se lee de cada respuesta; -5 si no aparece.
+function parseOffset(content) {
+  const match = /utcOffset:\s*(-?\d+(?:\.\d+)?)/.exec(content || '')
 
-  return dayjs.tz(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm', 'America/New_York').utc()
+  return match ? parseFloat(match[1]) : -5
 }
 
-function parseStop($item, date) {
+function parseStart($item, date, offset) {
+  const time = $item('td:nth-child(1) > div > time').attr('datetime')
+
+  return dayjs.utc(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm').subtract(offset * 60, 'minute')
+}
+
+function parseStop($item, date, offset) {
   const time = $item('td:nth-child(2) > div > time').attr('datetime')
 
-  return dayjs.tz(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm', 'America/New_York').utc()
+  return dayjs.utc(`${date.format('YYYY-MM-DD')} ${time}`, 'YYYY-MM-DD HH:mm').subtract(offset * 60, 'minute')
 }
 
 function parseItems(content) {
